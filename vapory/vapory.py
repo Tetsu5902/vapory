@@ -1,9 +1,13 @@
 import webbrowser # <= to open the POVRay help
 from copy import deepcopy
 import re
+
 from .io import render_povstring
+from .config import POVRAY_BINARY
+
 
 from .helpers import WIKIREF, vectorize, format_if_necessary
+
 
 class Scene:
     """ A scene contains Items and can be written to a file.
@@ -27,7 +31,10 @@ class Scene:
         self.defaults = defaults
         self.declares = declares
         self.global_settings = global_settings
-
+        
+        #Class variable
+        bin_path = POVRAY_BINARY
+        
     def __str__(self):
 
         included = ['#include "%s"'%e for e in self.included]
@@ -40,6 +47,13 @@ class Scene:
                           for l in  [included, declares, self.objects, [self.camera],
                               self.atmospheric, global_settings]
                           for e in l])
+
+    def set_binpath(binpath_):
+        import os
+        if not os.path.exists(binpath_):
+            raise FileNotFoundError(binpath_+" is not found.")
+
+        Scene.bin_path = binpath_
 
     def copy(self):
         return deepcopy(self)
@@ -91,7 +105,8 @@ class Scene:
 
         return render_povstring(str(self), outfile, height, width,
                                 quality, antialiasing, remove_temp, show_window,
-                                tempfile, includedirs, output_alpha)
+                                tempfile, includedirs, output_alpha,
+                                Scene.bin_path)
 
 
 class POVRayElement:

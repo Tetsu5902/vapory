@@ -5,6 +5,7 @@ All the advanced Input/Output operations for Vapory
 import re
 import os
 import subprocess
+
 from .config import POVRAY_BINARY
 
 try:
@@ -55,7 +56,8 @@ def ppm_to_numpy(filename=None, buffer=None, byteorder='>'):
 def render_povstring(string, outfile=None, height=None, width=None,
                      quality=None, antialiasing=None, remove_temp=True,
                      show_window=False, tempfile=None, includedirs=None,
-                     output_alpha=False):
+                     output_alpha=False,
+                     pov_binary=POVRAY_BINARY):
 
     """ Renders the provided scene description with POV-Ray.
 
@@ -87,6 +89,8 @@ def render_povstring(string, outfile=None, height=None, width=None,
 
     """
 
+    print(pov_binary)
+    
     pov_file = tempfile or '__temp__.pov'
     with open(pov_file, 'w+') as f:
         f.write(string)
@@ -102,7 +106,7 @@ def render_povstring(string, outfile=None, height=None, width=None,
     if display_in_ipython:
         outfile = '__temp_ipython__.png'
 
-    cmd = [POVRAY_BINARY, pov_file]
+    cmd = [pov_binary, pov_file]
     if height is not None: cmd.append('+H%d'%height)
     if width is not None: cmd.append('+W%d'%width)
     if quality is not None: cmd.append('+Q%d'%quality)
